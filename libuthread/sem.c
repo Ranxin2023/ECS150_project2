@@ -39,6 +39,7 @@ sem_t sem_create(size_t count)
 	sem_t sem=malloc(sizeof(struct semaphore));
 	if(!sem)return NULL;
 	sem->state=count;
+	return sem;
 }
 
 /*
