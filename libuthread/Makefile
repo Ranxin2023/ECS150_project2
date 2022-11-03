@@ -27,19 +27,37 @@ deps := $(patsubst %.o,%.d,$(obs))
 -include $(deps)
 
 # queue: $(objs)
-# @echo "CC $@"
-# $(Q)$(CC) $(CFLAGS) -o $@ $^
-# @./queue
+# 	@echo "CC	$@"
+# 	$(Q)$(CC) $(CFLAGS) -o $@ $^
+# 	@./queue
 
 # uthread: $(objs)
-# @echo "CC $@"
-# $(Q)$(CC) $(CFLAGS) -o $@ $^
-# @./uthread
+# 	@echo "CC	$@"
+# 	$(Q)$(CC) $(CFLAGS) -o $@ $^
+# 	@./uthread
 
 # context: $(objs)
-# @echo "CC $@"
-# $(Q)$(CC) $(CFLAGS) -o $@ $^
-# @./context
+# 	@echo "CC	$@"
+# 	$(Q)$(CC) $(CFLAGS) -o $@ $^
+# 	@./context
 
 %.a: $(objs)
-@echo "AR $@"
+	@echo "AR $@"
+	$(Q)$(AR) rcs $@ $^
+
+%.o: %.c
+	@echo "CC	$@"
+	$(Q)$(CC) $(CFLAGS) -c -o $@ $<
+
+# $(lib): $(SRCS) 
+#     ar -rcs libuthread.a queue.c
+
+clean:
+	@echo "CC	$@"
+	$(Q)rm -rvf $(targets) $(objs) $(deps) *.d
+
+
+# gcc contexts_fixed_schedule.c -o demo_code in CSIF
+# scp Makefile afong@pc16.cs.ucdavis.edu:/home/afong/libuthread
+.PHONY: clean
+.PRECIOUS: $(objs)
