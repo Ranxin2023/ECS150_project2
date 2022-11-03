@@ -118,7 +118,7 @@ int queue_dequeue(queue_t queue, void **data)
 	 * Return: -1 if @queue or @data are NULL, or if the queue is empty. 0 if @data
 	 * was set with the oldest item available in @queue.
 	 */
-	if (queue == NULL | data == NULL | (queue->size == 0)) {
+	if ((queue == NULL) | (data == NULL) | (queue->size == 0)) {
 		return -1;
 	}
 
@@ -157,7 +157,7 @@ int queue_delete(queue_t queue, void *data)
 
 
 
-	if (queue == NULL | data == NULL) {
+	if ((queue == NULL) | (data == NULL)) {
 		return -1;
 	}
 
@@ -211,7 +211,7 @@ int queue_iterate(queue_t queue, queue_func_t func)
 	 // *
 	 // * Return: -1 if @queue or @func are NULL, 0 otherwise.
 	
-	if (queue == NULL | func == NULL) {
+	if ((queue == NULL) | (func == NULL)) {
 		return -1;
 	}
 
