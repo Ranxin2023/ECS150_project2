@@ -44,15 +44,13 @@ sem_t sem_create(size_t count)
 }
 
 /*
- * sem_down - Take a semaphore
- * @sem: Semaphore to take
+ * sem_destroy - Deallocate a semaphore
+ * @sem: Semaphore to deallocate
  *
- * Take a resource from semaphore @sem.
+ * Deallocate semaphore @sem.
  *
- * Taking an unavailable semaphore will cause the caller thread to be blocked
- * until the semaphore becomes available.
- *
- * Return: -1 if @sem is NULL. 0 if semaphore was successfully taken.
+ * Return: -1 if @sem is NULL or if other threads are still being blocked on
+ * @sem. 0 is @sem was successfully destroyed.
  */
 
 int sem_destroy(sem_t sem)
@@ -79,13 +77,13 @@ int sem_down(sem_t sem)
 {
 	/* TODO Phase 3 */
 	if(!sem)return -1;
-	//spinlock_lock(sem);
+	spinlock_lock(sem);
 	while(sem->state==0){
 		/*Block self*/
 		
 	}
 	sem->state-=1;
-	//spinlock_unlock(sem);
+	spinlock_unlock(sem);
 	return 0;
 }
 
@@ -106,9 +104,9 @@ int sem_up(sem_t sem)
 {
 	/* TODO Phase 3 */
 	if(!sem)return -1;
-	//spinlock_lock(sem);
+	spinlock_lock(sem);
 	sem->state+=1;
-	//spinlock_unlock(sem);
+	spinlock_unlock(sem);
 	return 0;
 }
 
