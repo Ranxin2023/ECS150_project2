@@ -1,79 +1,45 @@
-# Target programs
-programs := \
-	queue_tester_example.x \
-	uthread_hello.x \
-	uthread_yield.x \
+# Target library
+lib := libuthread.a
 
-# User-level thread library
-UTHREADLIB := libuthread
-UTHREADPATH := ../$(UTHREADLIB)
-libuthread := $(UTHREADPATH)/$(UTHREADLIB).a
+# SRCS = libuthread/queue.c libuthread/uthread.c libuthread/context.c
 
-# Default rule
-all: $(programs)
-
-# Avoid builtin rules and variables
 MAKEFLAGS += -rR
+all: $(lib)
 
-# Don't print the commands unless explicitly requested with `make V=1`
+
+## TODO: Phase 1
+
+# targets := queue uthread context
+objs := queue.o uthread.o context.o
+
+CC := gcc
+CFLAGS := -Wall -Wextra -Werror -pipe -MMD
+
+AR := ar
+
 ifneq ($(V),1)
 Q = @
-V = 0
 endif
 
-# Current directory
-CUR_PWD := $(shell pwd)
+# all: $(targets)
 
-# Define compilation toolchain
-CC	= gcc
-
-# General gcc options
-CFLAGS	:= -Wall -Wextra -Werror
-CFLAGS	+= -pipe
-## Debug flag
-ifneq ($(D),1)
-CFLAGS	+= -O2
-else
-CFLAGS	+= -g
-endif
-## Include path
-CFLAGS 	+= -I$(UTHREADPATH)
-## Dependency generation
-CFLAGS	+= -MMD
-
-# Linker options
-LDFLAGS := -L$(UTHREADPATH) -luthread
-
-# Application objects to compile
-objs := $(patsubst %.x,%.o,$(programs))
-
-# Include dependencies
-deps := $(patsubst %.o,%.d,$(objs))
+deps := $(patsubst %.o,%.d,$(obs))
 -include $(deps)
 
-# Rule for libuthread.a
-$(libuthread): FORCE
-	@echo "MAKE	$@"
-	$(Q)$(MAKE) V=$(V) D=$(D) -C $(UTHREADPATH)
+# queue: $(objs)
+# @echo "CC $@"
+# $(Q)$(CC) $(CFLAGS) -o $@ $^
+# @./queue
 
-# Generic rule for linking final applications
-%.x: %.o $(libuthread)
-	@echo "LD	$@"
-	$(Q)$(CC) -o $@ $< $(LDFLAGS)
+# uthread: $(objs)
+# @echo "CC $@"
+# $(Q)$(CC) $(CFLAGS) -o $@ $^
+# @./uthread
 
-# Generic rule for compiling objects
-%.o: %.c
-	@echo "CC	$@"
-	$(Q)$(CC) $(CFLAGS) -c -o $@ $<
+# context: $(objs)
+# @echo "CC $@"
+# $(Q)$(CC) $(CFLAGS) -o $@ $^
+# @./context
 
-# Cleaning rule
-clean: FORCE
-	@echo "CLEAN	$(CUR_PWD)"
-	$(Q)$(MAKE) V=$(V) D=$(D) -C $(UTHREADPATH) clean
-	$(Q)rm -rf $(objs) $(deps) $(programs)
-
-# Keep object files around
-.PRECIOUS: %.o
-.PHONY: FORCE
-FORCE:
-
+%.a: $(objs)
+@echo "AR $@"

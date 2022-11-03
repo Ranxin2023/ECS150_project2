@@ -37,19 +37,46 @@ sem_t sem_create(size_t count)
 {
 	/* TODO Phase 3 */
 	sem_t sem=malloc(sizeof(struct semaphore));
-
+	if(!sem)return NULL;
 	sem->state=count;
 }
+
+/*
+ * sem_down - Take a semaphore
+ * @sem: Semaphore to take
+ *
+ * Take a resource from semaphore @sem.
+ *
+ * Taking an unavailable semaphore will cause the caller thread to be blocked
+ * until the semaphore becomes available.
+ *
+ * Return: -1 if @sem is NULL. 0 if semaphore was successfully taken.
+ */
 
 int sem_destroy(sem_t sem)
 {
 	/* TODO Phase 3 */
+	if(!sem)return -1;
 	free(sem);
+	return 0;
 }
+
+/*
+ * sem_down - Take a semaphore
+ * @sem: Semaphore to take
+ *
+ * Take a resource from semaphore @sem.
+ *
+ * Taking an unavailable semaphore will cause the caller thread to be blocked
+ * until the semaphore becomes available.
+ *
+ * Return: -1 if @sem is NULL. 0 if semaphore was successfully taken.
+ */
 
 int sem_down(sem_t sem)
 {
 	/* TODO Phase 3 */
+	if(!sem)return -1;
 	spinlock_lock(sem);
 	while(sem->state==0){
 		/*Block self*/
@@ -57,6 +84,7 @@ int sem_down(sem_t sem)
 	}
 	sem->state-=1;
 	spinlock_unlock(sem);
+	return 0;
 }
 
 /*
@@ -75,8 +103,10 @@ int sem_down(sem_t sem)
 int sem_up(sem_t sem)
 {
 	/* TODO Phase 3 */
+	if(!sem)return -1;
 	spinlock_lock(sem);
 	sem->state+=1;
 	spinlock_unlock(sem);
+	return 0;
 }
 
