@@ -35,6 +35,7 @@ struct semaphore {
  */
 sem_t sem_create(size_t count)
 {
+	//printf("semaphore create");
 	/* TODO Phase 3 */
 	sem_t sem=malloc(sizeof(struct semaphore));
 	if(!sem)return NULL;
@@ -78,13 +79,13 @@ int sem_down(sem_t sem)
 {
 	/* TODO Phase 3 */
 	if(!sem)return -1;
-	spinlock_lock(sem);
+	//spinlock_lock(sem);
 	while(sem->state==0){
 		/*Block self*/
 		
 	}
 	sem->state-=1;
-	spinlock_unlock(sem);
+	//spinlock_unlock(sem);
 	return 0;
 }
 
@@ -105,9 +106,9 @@ int sem_up(sem_t sem)
 {
 	/* TODO Phase 3 */
 	if(!sem)return -1;
-	spinlock_lock(sem);
+	//spinlock_lock(sem);
 	sem->state+=1;
-	spinlock_unlock(sem);
+	//spinlock_unlock(sem);
 	return 0;
 }
 
