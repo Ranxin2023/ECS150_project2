@@ -2,8 +2,7 @@
 programs := \
 	queue_tester_example.x \
 	uthread_hello.x \
-	uthread_yield.x \
-	sem_simple.x
+	uthread_yield.x 
 
 # User-level thread library
 UTHREADLIB := libuthread
