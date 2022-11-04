@@ -1,112 +1,73 @@
 #include <stddef.h>
 #include <stdlib.h>
-#include <pthread.h>
+
 #include "queue.h"
 #include "sem.h"
 #include "private.h"
 
-
-/*
- * sem_t - Semaphore type
- *
- * A semaphore is a way to control access to a common resource by multiple
- * threads. Such resource has an internal count, meaning that it can only be
- * shared a certain number of times. When a thread successfully takes the
- * resource, the count is decreased. When the resource is not available,
- * following threads are blocked until the resource becomes available again.
- */
+// #include "uthread.h"
 
 struct semaphore {
-	/* TODO Phase 3 */
-	int state;
-	int lock;
-	queue_t q;
+    /* TODO Phase 3 */
+    int count;
+    queue_t wq;
 };
 
-
-/*
- * sem_create - Create semaphore
- * @count: Semaphore count
- *
- * Allocate and initialize a semaphore of internal count @count.
- *
- * Return: Pointer to initialized semaphore. NULL in case of failure when
- * allocating the new semaphore.
- */
 sem_t sem_create(size_t count)
 {
-	//printf("semaphore create");
-	/* TODO Phase 3 */
-	sem_t sem=malloc(sizeof(struct semaphore));
-	if(!sem)return NULL;
-	sem->state=count;
-	return sem;
+    /* TODO Phase 3 */
+    struct semaphore *sem = malloc(sizeof(struct semaphore));
+    sem->count = count;
+    sem->wq = queue_create();
+    return sem;
 }
-
-/*
- * sem_destroy - Deallocate a semaphore
- * @sem: Semaphore to deallocate
- *
- * Deallocate semaphore @sem.
- *
- * Return: -1 if @sem is NULL or if other threads are still being blocked on
- * @sem. 0 is @sem was successfully destroyed.
- */
 
 int sem_destroy(sem_t sem)
 {
-	/* TODO Phase 3 */
-	if(!sem)return -1;
-	free(sem);
-	return 0;
+    /* TODO Phase 3 */
+    free(sem);
+    return 0;
 }
-
-/*
- * sem_down - Take a semaphore
- * @sem: Semaphore to take
- *
- * Take a resource from semaphore @sem.
- *
- * Taking an unavailable semaphore will cause the caller thread to be blocked
- * until the semaphore becomes available.
- *
- * Return: -1 if @sem is NULL. 0 if semaphore was successfully taken.
- */
 
 int sem_down(sem_t sem)
 {
-	/* TODO Phase 3 */
-	if(!sem)return -1;
-	spinlock_lock(sem);
-	while(sem->state==0){
-		/*Block self*/
-		
-	}
-	sem->state-=1;
-	spinlock_unlock(sem);
-	return 0;
-}
+    /* TODO Phase 3 */
+    /* Decrement by one, or block if already 0 */
+    // if sem->count > 0, decrement by one
+    if (sem->count > 0) {
+        sem->count -= 1;
+    } else {
+        queue_enqueue(sem->wq, uthread_current());
+        uthread_block();
+    }
 
-/*
- * sem_up - Release a semaphore
- * @sem: Semaphore to release
- *
- * Release a resource to semaphore @sem.
- *
- * If the waiting list associated to @sem is not empty, releasing a resource
- * also causes the first thread (i.e. the oldest) in the waiting list to be
- * unblocked.
- *
- * Return: -1 if @sem is NULL. 0 if semaphore was successfully released.
- */
+    // no need for while loop
+    
+    // while (sem->count == 0) {
+    //     /* Block self */
+    //     // enqueue current_thread to waiting queue
+    //     uthread_block();
+
+    // }
+    
+    return 0;
+}
 
 int sem_up(sem_t sem)
 {
-	/* TODO Phase 3 */
-	if(!sem)return -1;
-	spinlock_lock(sem);
-	sem->state+=1;
-	spinlock_unlock(sem);
-	return 0;
-}
+    /* TODO Phase 3 */
+    /* Increment by one, and wake up one of the waiting
+     * threads if any*/
+    if (queue_length(sem->wq) == 0) {
+        // nothing in the wl
+        sem->count += 1;
+    } else {
+        struct uthread_tcb *next_thread;
+        queue_dequeue(sem->wq, (void**)&next_thread);
+        uthread_unblock(next_thread);
+    }
 
+
+    
+    return 0;
+}
